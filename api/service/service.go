@@ -18,9 +18,12 @@ import (
 )
 
 // wrapper check ki rdb me hai nhi hai to mongodb ki method call kar
+// service layer is acting like a wrapper it will check ki data is present in redis or not and if not will bring the data mongo database and update the redis cache as well
 
+// cache is redis database
 var cache redisdb.Redis
 
+// create lead
 func Create(reqBody models.Lead) (*mongo.InsertOneResult, error) {
 	// unique id of the lead will be the length of the collection
 	ans, err := dataAccess.Collection.TotalDocument()
@@ -29,18 +32,22 @@ func Create(reqBody models.Lead) (*mongo.InsertOneResult, error) {
 	}
 	reqBody.UniqueId = ans
 
+	//calling the dataAccess layer and return the reponse sent by the dataAccess layer
 	return dataAccess.Collection.InsertOne(reqBody)
 }
 
+// get all lead
 func FindAll(filter interface{}, opts ...*options.FindOptions) []models.Lead {
-	var allLeads []models.Lead
+
+	var allLeads []models.Lead // this will contain all the leads
 	var oneLead models.Lead
+
+	//calling the dataAccess layer
 	findElementRes, err := dataAccess.Collection.FindAll(filter)
 	if err != nil {
-		//return err
 		fmt.Println("error in mongo - fetch FindAll")
 	}
-	//data
+	//dataAccess layer will return a cursor, we will iterate over it and will store it
 	for findElementRes.Next(context.Background()) {
 		err := findElementRes.Decode(&oneLead)
 		if err != nil {
@@ -59,13 +66,13 @@ func FindOne(filter interface{}, key string) models.Lead {
 	val2, err2 := cache.Get(key).Result()
 
 	if err2 == redis.Nil {
-		//add the key
+		//not present in redis database so add the key
 		fmt.Println("FindOne , adding the key, in if")
 		//checking if the leadId exists in db or not
 		var findOneLead models.Lead
-		keyInt, _ := strconv.Atoi(key)
 
-		err2 := dataAccess.Collection.FindOne(bson.M{"unique_id": keyInt}).Decode(&findOneLead)
+		//err2 := dataAccess.Collection.FindOne(bson.M{"unique_id": keyInt}).Decode(&findOneLead)
+		err2 := dataAccess.Collection.FindOne(filter).Decode(&findOneLead)
 
 		if err2 != nil {
 			fmt.Println("error in FindOne service layer")
@@ -81,8 +88,7 @@ func FindOne(filter interface{}, key string) models.Lead {
 		}
 		return findOneLead
 	} else {
-		fmt.Println("in findOne in else")
-		// exists in redisdb db , we will get the data from redisDb and will unmarshal it and return it
+		// exists in redisdb db
 
 		err := json.Unmarshal([]byte(val2), &ans)
 		if err != nil {
@@ -96,7 +102,8 @@ func FindOne(filter interface{}, key string) models.Lead {
 // update lead
 func UpdateOne(reqBody models.Lead, key string) (*mongo.UpdateResult, error) {
 
-	oneLead := FindOne(bson.M{"unique_id": key}, key)
+	keyInt, _ := strconv.Atoi(key)
+	oneLead := FindOne(bson.M{"unique_id": keyInt}, key)
 	var empty models.Lead
 	if oneLead == empty {
 		fmt.Println("Lead doesn't exists")
@@ -109,7 +116,7 @@ func UpdateOne(reqBody models.Lead, key string) (*mongo.UpdateResult, error) {
 	updateField := bson.M{"$set": bson.M{"first_name": reqBody.FirstName, "last_name": reqBody.LastName, "email": reqBody.Email, "phone_no": reqBody.PhoneNo, "company_name": reqBody.CompanyName, "country": reqBody.Country}}
 
 	//updateFileRes, err := collection.UpdateOne(bson.M{"unique_id": findOneLead.UniqueId}, updateField)
-	updateFileRes, err := dataAccess.Collection.UpdateOne(bson.M{"unique_id": key}, updateField)
+	updateFileRes, err := dataAccess.Collection.UpdateOne(bson.M{"unique_id": keyInt}, updateField)
 
 	if err != nil {
 		fmt.Println("error in updateFileRes")

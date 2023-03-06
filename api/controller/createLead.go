@@ -10,6 +10,7 @@ import (
 	"poc/pkg/models"
 )
 
+// handlerFunc for Create route
 func CreateLead(c echo.Context) error {
 
 	var reqBody models.Lead
@@ -23,9 +24,8 @@ func CreateLead(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, "validation match nhi huye")
 	}
 
-	//insert the data into the collection
-	//res, err4 := collection.InsertOne(reqBody)
-	res, err4 := service.Create(reqBody)
+	//insert the data into the collection - make call to the service layer
+	res, err4 := service.Create(reqBody) //service layer will return the response
 
 	if err4 != nil {
 		return err4

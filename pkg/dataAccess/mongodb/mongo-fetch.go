@@ -14,10 +14,6 @@ type Collection struct {
 	LeadCollection *mongo.Collection
 }
 
-//func (db *Collection) CreateMongoCollection(nameOfCollection string) {
-//	db.LeadCollection = config.Db.Collection(nameOfCollection) //creating the collection
-//}
-
 func (db *Collection) FindOne(filter interface{}) *mongo.SingleResult {
 	return db.LeadCollection.FindOne(context.Background(), filter)
 }

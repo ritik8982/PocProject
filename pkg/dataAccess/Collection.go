@@ -10,6 +10,7 @@ import (
 // collection can be differeent that 's why using this function to create the collection
 var Collection mongodb.Collection
 
+// this function will initialse the Collection
 func CreateLeadCollection() {
 	fmt.Println("inside the createLeadCollection")
 	Collection.LeadCollection = config.Db.Collection("Leads")

@@ -12,11 +12,10 @@ import (
 type Redis struct {
 }
 
+// this function will be called only from service layer
 func (cache *Redis) Set(key string, value interface{}, expiration time.Duration) *redis.StatusCmd {
 	return config.RedisDatabase.Set(context.Background(), key, value, expiration)
 }
 func (cache *Redis) Get(key string) *redis.StringCmd {
 	return config.RedisDatabase.Get(context.Background(), key)
 }
-
-//ye function kibal service layer se hi call honge

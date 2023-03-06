@@ -1,4 +1,4 @@
-#pull the latest image of golang
+#pull the latest image of golang - name of the image is golangapi
 FROM golang:latest
 
 #creating the build directory
@@ -10,6 +10,7 @@ WORKDIR /build
 COPY go.mod ./
 COPY go.sum ./
 
+# to copy all the code from the current directory
 COPY .. ./
 
 #so we can pull any version of package from github

@@ -10,9 +10,9 @@ import (
 	"poc/pkg/models"
 )
 
+// handler function for /get-lead(update) route
 func UpdateLead(c echo.Context) error {
 
-	//service layer call
 	key := c.QueryParam("leadId")
 
 	var reqBody models.Lead
@@ -27,7 +27,8 @@ func UpdateLead(c echo.Context) error {
 		return err2
 	}
 
-	ans, err3 := service.UpdateOne(reqBody, key)
+	//calling service layer
+	ans, err3 := service.UpdateOne(reqBody, key) //service layer will return the response
 	if err3 != nil {
 		return err3
 	}

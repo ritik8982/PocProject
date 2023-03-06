@@ -1,5 +1,6 @@
 package config
 
+//config is database layer
 import (
 	"context"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 
 var Db *mongo.Database
 
+// this function will create the redis database
 func CreateDatabase(dbName string) {
 	//connecting with mongodb
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
@@ -29,8 +31,10 @@ func CreateDatabase(dbName string) {
 
 }
 
+// this will represent RedisDatabase
 var RedisDatabase *redis.Client
 
+// this function will initialse the redis database instance
 func CreateRedisDatabase() {
 	RedisDatabase = redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
