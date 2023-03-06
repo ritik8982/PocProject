@@ -17,7 +17,6 @@ import (
 	"poc/pkg/models"
 )
 
-// wrapper check ki rdb me hai nhi hai to mongodb ki method call kar
 // service layer is acting like a wrapper it will check ki data is present in redis or not and if not will bring the data mongo database and update the redis cache as well
 
 // cache is redis database

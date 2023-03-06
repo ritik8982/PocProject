@@ -13,7 +13,7 @@ import (
 // handlerFunc for /get-all-leads route
 func GetAllLeads(c echo.Context) error {
 
-	var allLeads []models.Lead // this will store all the information related to lead
+	var allLeads []models.Lead // this will store all leads
 
 	elementFilter := bson.M{
 		"unique_id": bson.M{"$exists": true},
