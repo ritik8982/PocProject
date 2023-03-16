@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"poc/pkg/dataAccess"
+	"poc/pkg/dataAccess/mongodb"
 	"poc/pkg/dataAccess/redisdb"
 	"poc/pkg/models"
 )
@@ -22,17 +22,25 @@ import (
 // cache is redis database
 var cache redisdb.Redis
 
+var mongoCollection *mongodb.Collection
+
+func InitialiseCollection() {
+	mongoCollection = mongodb.GetCollection()
+}
+
 // create lead
 func Create(reqBody models.Lead) (*mongo.InsertOneResult, error) {
+
 	// unique id of the lead will be the length of the collection
-	ans, err := dataAccess.Collection.TotalDocument()
+	//ans, err := mongoCollection.TotalDocument()
+	ans, err := mongoCollection.TotalDocument()
 	if err != nil {
 		return nil, err
 	}
 	reqBody.UniqueId = ans
 
 	//calling the dataAccess layer and return the reponse sent by the dataAccess layer
-	return dataAccess.Collection.InsertOne(reqBody)
+	return mongoCollection.InsertOne(reqBody)
 }
 
 // get all lead
@@ -42,7 +50,8 @@ func FindAll(filter interface{}, opts ...*options.FindOptions) []models.Lead {
 	var oneLead models.Lead
 
 	//calling the dataAccess layer
-	findElementRes, err := dataAccess.Collection.FindAll(filter)
+	//findElementRes, err := dataAccess.Collection.FindAll(filter)
+	findElementRes, err := mongoCollection.FindAll(filter)
 	if err != nil {
 		fmt.Println("error in mongo - fetch FindAll")
 	}
@@ -71,7 +80,7 @@ func FindOne(filter interface{}, key string) models.Lead {
 		var findOneLead models.Lead
 
 		//err2 := dataAccess.Collection.FindOne(bson.M{"unique_id": keyInt}).Decode(&findOneLead)
-		err2 := dataAccess.Collection.FindOne(filter).Decode(&findOneLead)
+		err2 := mongoCollection.FindOne(filter).Decode(&findOneLead)
 
 		if err2 != nil {
 			fmt.Println("error in FindOne service layer")
@@ -115,7 +124,7 @@ func UpdateOne(reqBody models.Lead, key string) (*mongo.UpdateResult, error) {
 	updateField := bson.M{"$set": bson.M{"first_name": reqBody.FirstName, "last_name": reqBody.LastName, "email": reqBody.Email, "phone_no": reqBody.PhoneNo, "company_name": reqBody.CompanyName, "country": reqBody.Country}}
 
 	//updateFileRes, err := collection.UpdateOne(bson.M{"unique_id": findOneLead.UniqueId}, updateField)
-	updateFileRes, err := dataAccess.Collection.UpdateOne(bson.M{"unique_id": keyInt}, updateField)
+	updateFileRes, err := mongoCollection.UpdateOne(bson.M{"unique_id": keyInt}, updateField)
 
 	if err != nil {
 		fmt.Println("error in updateFileRes")
@@ -131,4 +140,5 @@ func UpdateOne(reqBody models.Lead, key string) (*mongo.UpdateResult, error) {
 		fmt.Println("not able to set the values in redisdb")
 	}
 	return updateFileRes, nil
+
 }

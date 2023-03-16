@@ -7,11 +7,18 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	"poc/pkg/config"
 	"poc/pkg/models"
 )
 
 type Collection struct {
 	LeadCollection *mongo.Collection
+}
+
+func GetCollection() *Collection {
+	return &Collection{
+		LeadCollection: config.Db.Collection("Leads"),
+	}
 }
 
 func (db *Collection) FindOne(filter interface{}) *mongo.SingleResult {
