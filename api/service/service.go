@@ -14,6 +14,7 @@ import (
 
 	"poc/pkg/dataAccess/mongodb"
 	"poc/pkg/dataAccess/redisdb"
+	"poc/pkg/logger"
 	"poc/pkg/models"
 )
 
@@ -22,25 +23,40 @@ import (
 // cache is redis database
 var cache redisdb.Redis
 
+// initialse logger
+var Log *logger.MyLogger
+
+func InitialiseLogger() {
+	Log = logger.GetLogger()
+}
+
+// initialse collection
 var mongoCollection *mongodb.Collection
 
 func InitialiseCollection() {
+	Log.Info("initialising mongoCollection in service layer")
 	mongoCollection = mongodb.GetCollection()
 }
 
 // create lead
 func Create(reqBody models.Lead) (*mongo.InsertOneResult, error) {
 
+	//Log.Info("Create method in service layer has started")
+
 	// unique id of the lead will be the length of the collection
 	//ans, err := mongoCollection.TotalDocument()
 	ans, err := mongoCollection.TotalDocument()
 	if err != nil {
+		// my log
+		Log.Error("error in Create Service layer")
 		return nil, err
 	}
 	reqBody.UniqueId = ans
 
 	//calling the dataAccess layer and return the reponse sent by the dataAccess layer
-	return mongoCollection.InsertOne(reqBody)
+	ans2, err2 := mongoCollection.InsertOne(reqBody)
+	//Log.Info("Create method in service layer has ended")
+	return ans2, err2
 }
 
 // get all lead

@@ -9,12 +9,18 @@ import (
 	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"poc/api/service"
 )
 
 var Db *mongo.Database
 
 // this function will create the redis database
 func CreateDatabase(dbName string) {
+
+	str := "mongo" + dbName + "database has created"
+	service.Log.Info(str) //logging
+
 	//connecting with mongodb
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
@@ -36,6 +42,9 @@ var RedisDatabase *redis.Client
 
 // this function will initialse the redis database instance
 func CreateRedisDatabase() {
+
+	service.Log.Info("redis database has been  created")
+
 	RedisDatabase = redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "", // no password set

@@ -12,18 +12,11 @@ func main() {
 
 	config.CreateRedisDatabase()   // creating the redis database
 	config.CreateDatabase("PocDb") //creating the mongo database
-	//dataAccess.CreateLeadCollection() // this function will create Collection instance and will initialse as well
-	service.InitialiseCollection()
+
+	service.InitialiseLogger()     // this will initialse the logger
+	service.InitialiseCollection() // this function will create Collection instance and will initialse as well
+
 	routes.CreateRoutesAndServer() // to make the routes and start Server
 
-	//var temp User
-	//temp.Name = "ysagfuj"
-	//
-	//
-	//temp2 := User{"yash"};
-	//temp2.Name
+	defer routes.LogFile.Close()
 }
-
-//type User struct {
-//	Name string
-//}

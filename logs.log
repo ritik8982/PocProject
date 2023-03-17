@@ -1,0 +1,2 @@
+{"level":"info","ts":"2023-03-17T10:00:40.193+0530","caller":"logger/logger.go:21","msg":"Create method in service layer has started"}
+{"level":"info","ts":"2023-03-17T10:00:40.213+0530","caller":"logger/logger.go:21","msg":"Create method in service layer has ended"}
